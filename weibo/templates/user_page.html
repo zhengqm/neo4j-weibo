@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %} {{nickname}}的个人主页 {% endblock %}
+
+{% block content %}
+
+<h1>{{ nickname }} 的个人主页 
+
+{% if session.user_id and session.user_id != user_id%}
+    {% if is_following %}
+    <button type="button" class="btn btn-warning">取消关注</button>
+    {% else %}
+    <a href="/follow/{{user_id}}"><button type="button" class="btn btn-primary">关注</button></a>
+
+    {% endif %}
+{% endif %}
+
+
+</h1>
+
+
+    {% include "render_posts.html" %}
+
+ {% endblock %}

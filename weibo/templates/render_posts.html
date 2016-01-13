@@ -1,0 +1,23 @@
+
+
+<div class="posts">
+{% for post in posts %}
+
+<div class="panel panel-default post">
+  <div class="panel-heading">
+    <span class="panel-title"><a href="{{url_for('show_user', user_id=post.u['id'])}}">{{post.u['nickname']}}</a> 说: </span> 
+
+    <span class="pull-right postdate">{{post.p['date']}}</span>
+
+  </div>
+  <div class="panel-body">
+    <p class="postbody">
+    {{post.p['content']}}
+    </p>
+
+  </div>
+</div>
+
+
+{% endfor %}
+</div>

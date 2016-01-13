@@ -1,0 +1,76 @@
+
+
+{% extends "layout.html" %}
+
+{% block title %} 主页 {% endblock %}
+
+
+
+{% block content %}
+{% if session.user_id %}
+    <h2>你好  {{ nickname }}! </h2>
+
+    
+
+    <h3>分享新鲜事</h3>
+
+    <form action="{{ url_for('add_post') }}" method="post" class="form-horizontal">
+        <div class="form-group">
+          <div class="col-lg-6">
+            <textarea name="content" rows="4" cols="40" class="form-control" ></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-lg-8">
+          <button type="submit" class="btn btn-default">分享</button>
+          </div>
+        </div>
+    </form>
+
+
+
+    {% include "render_posts.html" %}
+
+
+
+
+{% else %}
+
+
+  <h2>账号登陆</h2>
+
+<div> <!-- The left panel, leave the right empty for future information-->
+
+<form action="{{url_for('login')}}" method="POST" class="form-horizontal">
+  <div class="form-group">
+    <div class="col-lg-4">
+        <input type="email" class="form-control" name="email" placeholder="邮箱" size="40">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-lg-4">
+    <input type="password" class="form-control" name="password" placeholder="密码">
+    </div>
+  </div>
+
+    <div class="form-group">
+    <div class="col-lg-4">
+    <button type="submit" class="btn btn-default">登陆</button>
+    </div>
+  </div>
+  
+  
+</form>
+
+
+<div>
+<p>没有账号？<a href="{{url_for('register')}}">前去注册</a></p>
+</div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

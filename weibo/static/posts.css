@@ -1,0 +1,20 @@
+
+.post {
+    width: 50%;
+
+}
+
+.postdate{
+    color: gray;
+    font-size: 10pt;
+}
+
+.postbody{
+    font-size: 15pt;
+}
+
+.follow-button {
+    margin-bottom: 15px;
+
+}
+
