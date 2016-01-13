@@ -7,13 +7,31 @@
   <div class="panel-heading">
     <span class="panel-title"><a href="{{url_for('show_user', user_id=post.u['id'])}}">{{post.u['nickname']}}</a> 说: </span> 
 
-    <span class="pull-right postdate">{{post.p['date']}}</span>
+    <span class="pull-right post-small">{{post.p['date']}}</span>
 
   </div>
   <div class="panel-body">
     <p class="postbody">
     {{post.p['content']}}
     </p>
+
+    
+
+    <span class="pull-right">
+
+        <span class="post-small"> 评论() </span>
+        
+        <span class="post-small"> 赞() </span>
+
+        <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 更多 </span></a>
+
+
+
+    </span>
+
+
+    
+
 
   </div>
 </div>

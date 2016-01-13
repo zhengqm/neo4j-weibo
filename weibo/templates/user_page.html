@@ -8,7 +8,7 @@
 
 {% if session.user_id and session.user_id != user_id%}
     {% if is_following %}
-    <button type="button" class="btn btn-warning">取消关注</button>
+    <a href="/unfollow/{{user_id}}"><button type="button" class="btn btn-warning">取消关注</button></a>
     {% else %}
     <a href="/follow/{{user_id}}"><button type="button" class="btn btn-primary">关注</button></a>
 
@@ -18,7 +18,11 @@
 
 </h1>
 
-
+    <div class="row">
+        <div class="col-md-6">
     {% include "render_posts.html" %}
+    </div>
+ </div>
 
  {% endblock %}
+

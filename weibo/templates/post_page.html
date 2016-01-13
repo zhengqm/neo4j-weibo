@@ -1,2 +1,16 @@
 
-<h1>Page for post #{{ post_id }}</h1>
+<h1>Page for post {{post['id']}}</h1>
+
+
+<h2>Content:</h2>
+
+{{post['content']}}
+
+<h3>Todo: </h3>
+
+<ul>
+    <li>评论</li>
+    <li>点赞</li>
+</ul>
+
+<a href="{{url_for('index')}}">返回主页</a>

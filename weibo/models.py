@@ -73,6 +73,13 @@ class User:
         graph.create_unique(Relationship(fans, "FOLLOWED", target))
 
     @classmethod
+    def unfollow_user(cls, fans_id, target_id):
+        query = 'MATCH (:User {id:{fans_id}})-[r:FOLLOWED]->(:User {id:{target_id}}) RETURN r'
+        rel = graph.cypher.execute(query, fans_id=fans_id, target_id=target_id).one
+        if rel:
+            rel.delete()
+        
+    @classmethod
     def is_following(cls, fans_id, target_id):
         query = 'MATCH (:User {id:{fans_id}})-[r:FOLLOWED]->(:User {id:{target_id}}) RETURN r LIMIT 1'
         r = graph.cypher.execute(query, fans_id=fans_id, target_id=target_id)
@@ -88,6 +95,16 @@ class User:
         # TODO: Should order by time desc
         query = 'MATCH (:User {id:{user_id}})-[:FOLLOWED]->(u:User)-[:PUBLISHED]->(p:Post) RETURN u,p LIMIT 25'
         return graph.cypher.execute(query, user_id=user_id)
+
+class Post:
+    @classmethod
+    def find_by_id(cls, post_id):
+        post = graph.find_one("Post", "id", post_id)
+        return post
+
+def get_recent_posts():
+    query = 'MATCH (u:User )-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'
+    return graph.cypher.execute(query)
 
 
 def timestamp():

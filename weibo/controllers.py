@@ -1,5 +1,5 @@
 from flask import Flask, request, session, redirect, url_for, render_template, flash
-from models import User
+from models import User, Post, get_recent_posts
 
 app = Flask(__name__)
 
@@ -9,9 +9,10 @@ def index():
     if user_id:
         user = User.find_by_id(user_id)
         posts = User.retrieve_feed(user_id)
-        return render_template('index.html',  nickname=user['nickname'], posts = posts)
+        return render_template('index.html',  posts = posts, nickname=user['nickname'])
     else:
-        return render_template('index.html')
+        posts = get_recent_posts()
+        return render_template('index.html', posts = posts)
 
 
 @app.route('/register', methods=['GET','POST'])
@@ -68,6 +69,17 @@ def follow(target_id):
     return redirect(url_for('index'))
 
 
+@app.route('/unfollow/<target_id>')
+def unfollow(target_id):
+    self_id = session.get('user_id')
+    target = User.find_by_id(target_id)
+    posts = User.retrieve_posts(target_id)
+    if self_id and target:
+        User.unfollow_user(self_id, target_id)
+        return redirect(url_for('show_user', user_id=target_id))
+    return redirect(url_for('index'))
+
+
 @app.route('/add_post', methods=['POST'])
 def add_post():
     user_id = session.get('user_id')
@@ -83,8 +95,11 @@ def add_post():
 @app.route('/post/<post_id>', methods=['GET'])
 def show_post(post_id):
     # Check login status
-
-    return render_template('post_page.html', post_id=post_id)
+    post = Post.find_by_id(post_id)
+    if post:
+        return render_template('post_page.html', post=post)
+    else:
+        return redirect(url_for('index'))
 
 
 

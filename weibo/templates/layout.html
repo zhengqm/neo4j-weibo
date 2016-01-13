@@ -27,7 +27,7 @@
       {% if session.user_id %}
         <ul class="nav navbar-nav navbar-right">
             <li><a href="{{url_for('show_user', user_id=session.user_id)}}">
-            {{nickname}}的主页</a></li>
+            我的主页</a></li>
             <li><a href="{{url_for('logout')}}"> 退出登录</a></li>
         </ul>
       {% endif %}
