@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from py2neo import Graph, Node, Relationship, authenticate
 from passlib.hash import bcrypt
 from datetime import datetime
@@ -87,13 +89,12 @@ class User:
   
     @classmethod
     def retrieve_posts(cls, user_id):
-        query = 'MATCH (u:User {id:{user_id}})-[:PUBLISHED]->(p:Post) RETURN u,p LIMIT 25'
+        query = 'MATCH (u:User {id:{user_id}})-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'
         return graph.cypher.execute(query, user_id=user_id)
 
     @classmethod
     def retrieve_feed(cls, user_id):
-        # TODO: Should order by time desc
-        query = 'MATCH (:User {id:{user_id}})-[:FOLLOWED]->(u:User)-[:PUBLISHED]->(p:Post) RETURN u,p LIMIT 25'
+        query = 'MATCH (:User {id:{user_id}})-[:FOLLOWED]->(u:User)-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'
         return graph.cypher.execute(query, user_id=user_id)
 
 class Post:

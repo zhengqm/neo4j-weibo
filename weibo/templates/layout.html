@@ -26,6 +26,8 @@
 
       {% if session.user_id %}
         <ul class="nav navbar-nav navbar-right">
+            <li><a href="{{url_for('recent_posts')}}">
+            最新微博</a></li>
             <li><a href="{{url_for('show_user', user_id=session.user_id)}}">
             我的主页</a></li>
             <li><a href="{{url_for('logout')}}"> 退出登录</a></li>
@@ -36,7 +38,14 @@
         </div><!--/.container-fluid -->
       </nav>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
 
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     <div id="content" >{% block content %}{% endblock %}</div>
     <div id="footer"></div>
 

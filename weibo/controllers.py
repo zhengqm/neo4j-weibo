@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 from models import User, Post, get_recent_posts
+
+import re
 
 app = Flask(__name__)
 
@@ -15,6 +18,15 @@ def index():
         return render_template('index.html', posts = posts)
 
 
+@app.route('/recent_posts')
+def recent_posts():
+    if session.get('user_id'):
+        posts = get_recent_posts()
+        return render_template('recent_posts.html', posts = posts)
+    else:
+        return redirect(url_for('index'))
+
+
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
@@ -22,16 +34,18 @@ def register():
         email    = request.form['email']
         password = request.form['password']
 
-        if len(email) < 1:
-            flash('Your email must be at least one character.')
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash('电子邮件格式不正确','danger')
         elif len(password) < 6:
-            flash('Your password must be at least 6 characters.')
+            flash('密码长度须大于等于6', 'danger')
+        elif len(nickname) < 6:
+            flash('昵称不能为空', 'danger')
         elif not User.register(email, password, nickname):
-            flash('A user with that email already exists.')
+            flash('该邮箱已被用于注册', 'danger')
         else:
             user = User.find_by_email(email)
             session['user_id'] = user['id']
-            flash('Logged in.')
+            flash('成功登陆', 'success')
             return redirect(url_for('index'))
 
     return render_template('register.html')
@@ -43,18 +57,18 @@ def login():
     password = request.form['password']
 
     if not User.verify_password(email, password):
-        flash('Invalid login.')
+        flash('错误的邮箱或密码','danger')
     else:
         user = User.find_by_email(email)
         session['user_id'] = user['id']
-        flash('Logged in.')
+        flash('成功登陆', 'success')
     return redirect(url_for('index'))
 
 
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
-    flash('Logged out.')
+    flash('成功登出', 'success')
     return redirect(url_for('index'))
 
 
@@ -85,10 +99,12 @@ def add_post():
     user_id = session.get('user_id')
     if user_id:
         content = request.form['content']
-        if not content:
-            flash('You must say something.')
+        if not content or len(content) == 0:
+            flash('微博内容不能为空','danger')
         else:
             User.add_post(user_id, content, [])
+            flash('成功发布', 'success')
+            return redirect(url_for('show_user', user_id=user_id))
 
     return redirect(url_for('index'))
 
