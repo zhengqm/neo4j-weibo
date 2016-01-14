@@ -161,9 +161,17 @@ def add_comment():
     if user_id:
         content = request.form['content']
         post_id = request.form['post_id']
+        target_user_id = request.form['target_user_id']
         if not content or len(content) == 0:
             flash('评论内容不能为空','danger')
         else:
+            if target_user_id:
+                target_user = User.find_by_id(target_user_id)
+                if content.find(target_user['nickname']) and content.index(target_user['nickname']) == 2:
+                    realContent = content[content.index(target_user['nickname']) + len(target_user['nickname']) + 1:]
+                    User.add_comment_on_comment(user_id, post_id, target_user_id, realContent, 'tags')
+                    flash('成功评论', 'success')
+                    return redirect(url_for('show_post', post_id=post_id))
             User.add_comment_on_post(user_id, post_id, content, 'tags')
             flash('成功评论', 'success')
             return redirect(url_for('show_post', post_id=post_id))

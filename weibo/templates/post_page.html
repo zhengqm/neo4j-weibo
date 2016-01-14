@@ -1,4 +1,12 @@
-
+<html>
+<head>
+<script language="javascript">
+function replyTo(str, target_user_id) {
+document.getElementById('content').value = "回复"+str+":";
+document.getElementById('target_user_id').value = target_user_id;
+}
+</script>
+</head>
 <h1>Page for post {{post['id']}}</h1>
 
 
@@ -7,7 +15,21 @@
 {{post['content']}}
 
 <h3>Todo: </h3>
+<form action="{{ url_for('add_comment') }}" method="post" class="form-horizontal">
+        <div class="form-group">
+          <div class="col-lg-12">
+			<input type="hidden" name="post_id" value="{{post['id']}}"></input>
+			<input id="target_user_id"type="hidden" name="target_user_id" value=""></input>
+            <textarea id='content'name='content' rows="4" cols="40" class="form-control" ></textarea>
+          </div>
+        </div>
 
+        <div class="form-group">
+          <div class="col-lg-12">
+          <button type="submit" class="btn btn-default">评论</button>
+          </div>
+        </div>
+    </form>
     <li>评论</li>
 	{% for comment in comments %}
 
@@ -20,8 +42,12 @@
   </div>
   <div class="panel-body">
     <p class="postbody">
-    {{comment.c['content']}}
-    </p>
+	{%if comment.t %}
+    {{comment.c['content']}} 
+	{% else %}
+	回复<a href="{{url_for('show_user', user_id=comment.t['id'])}}">{{comment.t['nickname']}}</a>:{{comment.c['content']}}
+	{% endif %}
+	<span class="pull-right post-small"><input type="button" value="回复" onclick="replyTo('{{comment.u['nickname']}}', '{{comment.u['id']}}');" ></span>
   </div>
   <a href="/comment/"
 </div>
@@ -35,3 +61,4 @@
  </p>
 {% endfor %}
 <a href="{{url_for('index')}}">返回主页</a>
+</html>

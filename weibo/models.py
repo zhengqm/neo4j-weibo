@@ -126,7 +126,7 @@ class User:
         Comment.comment_on_post(comment["id"], target_id, tags)
 
     @classmethod
-    def add_comment_on_comment(cls, user_id, target_id, post_id, content, tags):
+    def add_comment_on_comment(cls, user_id, post_id, target_user_id, content, tags):
         user = User.find_by_id(user_id)
         comment = Node(
             "Comment",
@@ -135,9 +135,12 @@ class User:
             timestamp=timestamp(),
             date=date()
         )
+        target_user = User.find_by_id(target_user_id)
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
-        Comment.comment_on_comment(comment['id'], target_id, post_id, tags)
+        rel_comment = Relationship(comment, "REPLIED", target_user)
+        graph.create(rel_comment)
+        Comment.comment_on_comment(comment['id'], post_id, tags)
 
     @classmethod
     def like_comment(cls, user_id, comment_id):
@@ -159,7 +162,12 @@ class Post:
         graph.create(rel_repost)
     @classmethod
     def retrieve_comments(cls, post_id):
-        query = 'MATCH (u:User)-[:PUBLISHED]->(c:Comment)-[:COMMENTED]->(Post{id:{post_id}}) RETURN u,c ORDER BY c.timestamp DESC LIMIT 25'
+        #query = 'MATCH (u:User)-[:PUBLISHED]->(c:Comment)-[:COMMENTED]->(Post{id:{post_id}}) RETURN u,c ORDER BY c.timestamp DESC LIMIT 25'
+        query = 'MATCH(u:User) \
+		         MATCH(c:Comment)\
+				 OPTIONAL MATCH (u)-[:PUBLISHED]->(c)-[:COMMENTED]->(Post{id:{post_id}})\
+				 OPTIONAL MATCH (u)-[:PUBLISHED]->(c)-[:REPLIED]-> (t:User) \
+				 RETURN u,c,t ORDER BY c.timestamp DESC LIMIT 25'
         return graph.cypher.execute(query, post_id=post_id)
     @classmethod
     def retrieve_likes(cls, post_id):
@@ -180,12 +188,9 @@ class Comment:
         graph.create(rel_comment_on_post)
 
     @classmethod
-    def comment_on_comment(cls, comment_id, target_id, post_id, tags):
+    def comment_on_comment(cls, comment_id, post_id, tags):
         comment = Comment.find_by_id(comment_id)
-        target = Comment.find_by_id(target_id)
         post = Post.find_by_id(post_id)
-        rel_comment_on_comment = Relationship(comment, "REPLIED", target)
-        graph.create(rel_comment_on_comment)
         rel_comment_on_comment_with_post = Relationship(comment, "COMMENTED", post)
         graph.create(rel_comment_on_comment_with_post)
 
