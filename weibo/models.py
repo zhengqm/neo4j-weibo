@@ -83,6 +83,15 @@ class User:
         graph.create_unique(Relationship(user, "LIKED", post))
 
     @classmethod
+    def unlike_post(cls, user_id, post_id):
+        query = 'MATCH (:User {id:{user_id}})-[r:LIKED]->(:Post {id:{post_id}}) RETURN r'
+        rel = graph.cypher.execute(query, user_id=user_id, post_id=post_id).one
+        if rel:
+            rel.delete()
+            return True
+        return False
+
+    @classmethod
     def follow_user(cls, fans_id, target_id):
         fans = User.find_by_id(fans_id)
         target = User.find_by_id(target_id)
