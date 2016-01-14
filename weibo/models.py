@@ -63,6 +63,20 @@ class User:
         graph.create(rel)
 
     @classmethod
+    def add_repost(cls, user_id, target_id, content, tags):
+        user = User.find_by_id(user_id)
+        repost = Node(
+            "Post",
+            id=str(uuid.uuid4()), 
+            content=content,
+            timestamp=timestamp(),
+            date=date()
+        )
+        rel = Relationship(user, "PUBLISHED", repost)
+        graph.create(rel)
+        Post.repost(repost.id, target_id, tags)
+
+    @classmethod
     def like_post(cls, user_id, post_id):
         user = User.find_by_id(user_id)
         post = graph.find_one("Post", "id", post_id)
@@ -97,11 +111,72 @@ class User:
         query = 'MATCH (:User {id:{user_id}})-[:FOLLOWED]->(u:User)-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'
         return graph.cypher.execute(query, user_id=user_id)
 
+    @classmethod
+    def add_comment_on_post(cls, user_id, target_id, content, tags):
+        user = User.find_by_id(user_id)
+        comment = Node(
+            "Comment",
+            id=str(uuid.uuid4()),
+            content=content,
+            timestamp=timestamp(),
+            date=date()
+        )
+        rel_publish = Relationship(user, "PUBLISHED", comment)
+        graph.create(rel)
+        Comment.comment_on_post(comment.id, target_id, tags)#what is the 1st argument when a class method is called?
+
+    @classmethod
+    def add_comment_on_comment(cls, user_id, target_id, content, tags):
+        user = User.find_by_id(user_id)
+        comment = Node(
+            "Comment",
+            id=str(uuid.uuid4()),
+            content=content,
+            timestamp=timestamp(),
+            date=date()
+        )
+        rel_publish = Relationship(user, "PUBLISHED", comment)
+        graph.create(rel)
+        Comment.comment_on_comment(comment.id, target_id, tags)#what is the 1st argument when a class method is called?
+
+    @classmethod
+    def like_comment(cls, user_id, comment_id):
+        user = User.find_by_id(user_id)
+        comment = graph.find_one("Comment", "id", comment_id)
+        graph.create_unique(Relationship(user, "LIKED", comment))
+
 class Post:
     @classmethod
     def find_by_id(cls, post_id):
         post = graph.find_one("Post", "id", post_id)
         return post
+
+    @classmethod
+    def repost(cls, repost_id, post_id, tags):
+        repost = Post.find_by_id(repost_id)
+        post = Post.find_by_id(post_id)
+        rel_repost = Relationship(repost, "REPOSTED", post)
+        graph.create(rel_repost)
+
+class Comment:
+    @classmethod
+    def find_by_id(cls, comment_id):
+        comment = graph.find_one("Comment", "id", comment_id)
+        return comment
+
+    @classmethod
+    def comment_on_post(cls, comment_id, post_id, tags):
+        comment = Comment.find_by_id(comment_id)
+        post = Post.find_by_id(post_id)
+        rel_comment_on_post = Relationship(repost, "COMMENTED", post)
+        graph.create(rel_comment_on_post)
+
+    @classmethod
+    def comment_on_comment(cls, comment_id, target_id, tags):
+        comment = Comment.find_by_id(comment_id)
+        target = Comment.find_by_id(target_id)
+        rel_comment_on_post = Relationship(repost, "COMMENTED", target)
+        graph.create(rel_comment_on_comment)
 
 def get_recent_posts():
     query = 'MATCH (u:User )-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'
