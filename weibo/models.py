@@ -72,9 +72,9 @@ class User:
             timestamp=timestamp(),
             date=date()
         )
-        rel = Relationship(user, "PUBLISHED", repost)
-        graph.create(rel)
-        Post.repost(repost.id, target_id, tags)
+        rel_publish = Relationship(user, "PUBLISHED", repost)
+        graph.create(rel_publish)
+        Post.repost(repost['id'], target_id, tags)
 
     @classmethod
     def like_post(cls, user_id, post_id):
@@ -123,7 +123,11 @@ class User:
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
+<<<<<<< HEAD
         Comment.comment_on_post(comment['id'], target_id, tags)#what is the 1st argument when a class method is called?
+=======
+        Comment.comment_on_post(comment['id'], target_id, tags)
+>>>>>>> origin/master
 
     @classmethod
     def add_comment_on_comment(cls, user_id, target_id, content, tags):
@@ -136,8 +140,8 @@ class User:
             date=date()
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
-        graph.create(rel)
-        Comment.comment_on_comment(comment.id, target_id, tags)#what is the 1st argument when a class method is called?
+        graph.create(rel_publish)
+        Comment.comment_on_comment(comment['id'], target_id, tags)
 
     @classmethod
     def like_comment(cls, user_id, comment_id):
@@ -179,7 +183,7 @@ class Comment:
     def comment_on_comment(cls, comment_id, target_id, tags):
         comment = Comment.find_by_id(comment_id)
         target = Comment.find_by_id(target_id)
-        rel_comment_on_post = Relationship(repost, "COMMENTED", target)
+        rel_comment_on_post = Relationship(comment, "COMMENTED", target)
         graph.create(rel_comment_on_comment)
 
 def get_recent_posts():
