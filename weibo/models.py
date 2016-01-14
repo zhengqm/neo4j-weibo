@@ -121,11 +121,7 @@ class User:
         Comment.comment_on_post(comment["id"], user_id_of_target, post_id, tags)
 
     @classmethod
-<<<<<<< HEAD
-    def add_comment_on_comment(cls, user_id, post_id, target_user_id, content, tags):
-=======
     def add_comment_on_comment(cls, user_id, user_id_of_target, post_id, content, tags):
->>>>>>> origin/master
         user = User.find_by_id(user_id)
         comment = Node(
             "Comment",
@@ -134,16 +130,10 @@ class User:
             timestamp=timestamp(),
             date=date()
         )
-        target_user = User.find_by_id(target_user_id)
+        target_user = User.find_by_id(user_id_of_target)
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
-<<<<<<< HEAD
-        rel_comment = Relationship(comment, "REPLIED", target_user)
-        graph.create(rel_comment)
-        Comment.comment_on_comment(comment['id'], post_id, tags)
-=======
         Comment.comment_on_comment(comment["id"], user_id_of_target, post_id, tags)
->>>>>>> origin/master
 
     @classmethod
     def like_comment(cls, user_id, comment_id):
@@ -170,6 +160,9 @@ class Post:
     def retrieve_likes(cls, post_id):
         query = 'MATCH (u:User)-[:LIKED]->(Post{id:{post_id}}) RETURN u ORDER BY u.nickname ASC LIMIT 25'
         return graph.cypher.execute(query, post_id=post_id)
+    def find_poster(cls, post_id):
+        query = 'MATCH (u:User)-[:PUBLISHED]->(Post{id:{post_id}}) RETURN u ORDER BY u.nickname ASC LIMIT 1'
+        return graph.cypher.execute(query, post_id=post_id)
 		
 class Comment:
     @classmethod
@@ -188,13 +181,6 @@ class Comment:
         graph.create(rel_comment_on_post)
 
     @classmethod
-<<<<<<< HEAD
-    def comment_on_comment(cls, comment_id, post_id, tags):
-        comment = Comment.find_by_id(comment_id)
-        post = Post.find_by_id(post_id)
-        rel_comment_on_comment_with_post = Relationship(comment, "COMMENTED", post)
-        graph.create(rel_comment_on_comment_with_post)
-=======
     def comment_on_comment(cls, comment_id, post_user_id, post_id, tags):
         comment = Comment.find_by_id(comment_id)
         post_user = User.find_by_id(post_user_id)
@@ -203,7 +189,6 @@ class Comment:
         graph.create(rel_reply)
         rel_comment_on_post = Relationship(comment, "COMMENTED", post)
         graph.create(rel_comment_on_post)
->>>>>>> origin/master
 
 def get_recent_posts():
     query = 'MATCH (u:User )-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'

@@ -168,15 +168,15 @@ def add_comment():
             if target_user_id:
                 target_user = User.find_by_id(target_user_id)
                 if content.find(target_user['nickname']) and content.index(target_user['nickname']) == 2:
-                    realContent = content[content.index(target_user['nickname']) + len(target_user['nickname']) + 1:]
-                    User.add_comment_on_comment(user_id, post_id, target_user_id, realContent, 'tags')
+                    content = content[content.index(target_user['nickname']) + len(target_user['nickname']) + 1:]
+                    User.add_comment_on_comment(user_id, target_user_id, post_id, content, 'tags')
                     flash('成功评论', 'success')
                     return redirect(url_for('show_post', post_id=post_id))
-            User.add_comment_on_post(user_id, post_id, content, 'tags')
+            #post_user_id = Post.find_poster(post_id)
+            User.add_comment_on_post(user_id, user_id, post_id, content, 'tags')
             flash('成功评论', 'success')
             return redirect(url_for('show_post', post_id=post_id))
     return redirect(url_for('index'))
-
 
 @app.route('/like/<post_id>', methods=['POST'])
 def like_post(post_id):
