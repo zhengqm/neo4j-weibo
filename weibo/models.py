@@ -63,20 +63,6 @@ class User:
         graph.create(rel)
 
     @classmethod
-    def add_repost(cls, user_id, target_id, content, tags):
-        user = User.find_by_id(user_id)
-        repost = Node(
-            "Post",
-            id=str(uuid.uuid4()), 
-            content=content,
-            timestamp=timestamp(),
-            date=date()
-        )
-        rel_publish = Relationship(user, "PUBLISHED", repost)
-        graph.create(rel_publish)
-        Post.repost(repost["id"], target_id, tags)
-
-    @classmethod
     def like_post(cls, user_id, post_id):
         user = User.find_by_id(user_id)
         post = graph.find_one("Post", "id", post_id)
@@ -121,7 +107,7 @@ class User:
         return graph.cypher.execute(query, user_id=user_id)
 
     @classmethod
-    def add_comment_on_post(cls, user_id, target_id, content, tags):
+    def add_comment_on_post(cls, user_id, user_id_of_target, post_id, content, tags):
         user = User.find_by_id(user_id)
         comment = Node(
             "Comment",
@@ -132,10 +118,10 @@ class User:
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
-        Comment.comment_on_post(comment["id"], target_id, tags)
+        Comment.comment_on_post(comment["id"], user_id_of_target, post_id, tags)
 
     @classmethod
-    def add_comment_on_comment(cls, user_id, target_id, post_id, content, tags):
+    def add_comment_on_comment(cls, user_id, user_id_of_target, post_id, content, tags):
         user = User.find_by_id(user_id)
         comment = Node(
             "Comment",
@@ -146,7 +132,7 @@ class User:
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
-        Comment.comment_on_comment(comment['id'], target_id, post_id, tags)
+        Comment.comment_on_comment(comment["id"], user_id_of_target, post_id, tags)
 
     @classmethod
     def like_comment(cls, user_id, comment_id):
@@ -160,12 +146,6 @@ class Post:
         post = graph.find_one("Post", "id", post_id)
         return post
 
-    @classmethod
-    def repost(cls, repost_id, post_id, tags):
-        repost = Post.find_by_id(repost_id)
-        post = Post.find_by_id(post_id)
-        rel_repost = Relationship(repost, "REPOSTED", post)
-        graph.create(rel_repost)
     @classmethod
     def retrieve_comments(cls, post_id):
         query = 'MATCH (u:User)-[:PUBLISHED]->(c:Comment)-[:COMMENTED]->(Post{id:{post_id}}) RETURN u,c ORDER BY c.timestamp DESC LIMIT 25'
@@ -182,21 +162,24 @@ class Comment:
         return comment
 
     @classmethod
-    def comment_on_post(cls, comment_id, post_id, tags):
+    def comment_on_post(cls, comment_id, post_user_id, post_id, tags):
         comment = Comment.find_by_id(comment_id)
+        post_user = Post.find_by_id(post_id)
         post = Post.find_by_id(post_id)
+        rel_comment_on_post = Relationship(comment, "REPLIED", post_user)
+        graph.create(rel_comment_on_post)
         rel_comment_on_post = Relationship(comment, "COMMENTED", post)
         graph.create(rel_comment_on_post)
 
     @classmethod
-    def comment_on_comment(cls, comment_id, target_id, post_id, tags):
+    def comment_on_comment(cls, comment_id, post_user_id, post_id, tags):
         comment = Comment.find_by_id(comment_id)
-        target = Comment.find_by_id(target_id)
+        post_user = User.find_by_id(post_user_id)
         post = Post.find_by_id(post_id)
-        rel_comment_on_comment = Relationship(comment, "REPLIED", target)
-        graph.create(rel_comment_on_comment)
-        rel_comment_on_comment_with_post = Relationship(comment, "COMMENTED", post)
-        graph.create(rel_comment_on_comment_with_post)
+        rel_reply = Relationship(comment, "REPLIED", post_user)
+        graph.create(rel_reply)
+        rel_comment_on_post = Relationship(comment, "COMMENTED", post)
+        graph.create(rel_comment_on_post)
 
 def get_recent_posts():
     query = 'MATCH (u:User )-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'
