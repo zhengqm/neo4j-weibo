@@ -123,11 +123,7 @@ class User:
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
-<<<<<<< HEAD
-        Comment.comment_on_post(comment['id'], target_id, tags)#what is the 1st argument when a class method is called?
-=======
         Comment.comment_on_post(comment['id'], target_id, tags)
->>>>>>> origin/master
 
     @classmethod
     def add_comment_on_comment(cls, user_id, target_id, content, tags):
