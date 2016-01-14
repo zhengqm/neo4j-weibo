@@ -178,10 +178,18 @@ def add_comment():
     return redirect(url_for('index'))
 
 
-@app.route('/like/<post_id>', methods=['GET'])
+@app.route('/like/<post_id>', methods=['POST'])
 def like_post(post_id):
     user_id = session.get('user_id')
     if user_id:
         User.like_post(user_id, post_id)
-        return redirect(url_for('show_post', post_id=post_id))
-    return redirect(url_for('comment_page', post_id = post_id))
+        return True # Should be some json here?
+    return False 
+
+@app.route('/unlike/<post_id>', methods=['POST'])
+def unlike_post(post_id):
+    user_id = session.get('user_id')
+    if user_id:
+        if User.unlike_post(user_id, post_id):
+            return True # Should be some json here?
+    return False
