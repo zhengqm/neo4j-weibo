@@ -29,4 +29,9 @@
 
 {% endfor %}
 <li>点赞</li>
+{% for like in likes %}
+ <p class="postbody">
+    <a href="{{url_for('show_user', user_id=like.u['id'])}}">{{like.u['nickname']}}</a>
+ </p>
+{% endfor %}
 <a href="{{url_for('index')}}">返回主页</a>

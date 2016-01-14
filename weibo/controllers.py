@@ -114,8 +114,9 @@ def show_post(post_id):
     post = Post.find_by_id(post_id)
 	# Search all the comments related.
     comments = Post.retrieve_comments(post_id)
+    likes = Post.retrieve_likes(post_id)
     if post:
-        return render_template('post_page.html', post=post, comments=comments)
+        return render_template('post_page.html', post=post, comments=comments, likes=likes)
     else:
         return redirect(url_for('index'))
 

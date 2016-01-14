@@ -161,6 +161,10 @@ class Post:
     def retrieve_comments(cls, post_id):
         query = 'MATCH (u:User)-[:PUBLISHED]->(c:Comment)-[:COMMENTED]->(Post{id:{post_id}}) RETURN u,c ORDER BY c.timestamp DESC LIMIT 25'
         return graph.cypher.execute(query, post_id=post_id)
+    @classmethod
+    def retrieve_likes(cls, post_id):
+        query = 'MATCH (u:User)-[:LIKED]->(Post{id:{post_id}}) RETURN u ORDER BY u.nickname ASC LIMIT 25'
+        return graph.cypher.execute(query, post_id=post_id)
 		
 class Comment:
     @classmethod
