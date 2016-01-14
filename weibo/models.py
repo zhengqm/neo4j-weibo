@@ -74,7 +74,7 @@ class User:
         )
         rel_publish = Relationship(user, "PUBLISHED", repost)
         graph.create(rel_publish)
-        Post.repost(repost['id'], target_id, tags)
+        Post.repost(repost["id"], target_id, tags)
 
     @classmethod
     def like_post(cls, user_id, post_id):
@@ -123,10 +123,10 @@ class User:
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
-        Comment.comment_on_post(comment['id'], target_id, tags)
+        Comment.comment_on_post(comment["id"], target_id, tags)
 
     @classmethod
-    def add_comment_on_comment(cls, user_id, target_id, content, tags):
+    def add_comment_on_comment(cls, user_id, target_id, post_id, content, tags):
         user = User.find_by_id(user_id)
         comment = Node(
             "Comment",
@@ -137,7 +137,7 @@ class User:
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
         graph.create(rel_publish)
-        Comment.comment_on_comment(comment['id'], target_id, tags)
+        Comment.comment_on_comment(comment['id'], target_id, post_id, tags)
 
     @classmethod
     def like_comment(cls, user_id, comment_id):
@@ -176,16 +176,18 @@ class Comment:
         graph.create(rel_comment_on_post)
 
     @classmethod
-    def comment_on_comment(cls, comment_id, target_id, tags):
+    def comment_on_comment(cls, comment_id, target_id, post_id, tags):
         comment = Comment.find_by_id(comment_id)
         target = Comment.find_by_id(target_id)
-        rel_comment_on_post = Relationship(comment, "COMMENTED", target)
+        post = Post.find_by_id(post_id)
+        rel_comment_on_comment = Relationship(comment, "REPLIED", target)
         graph.create(rel_comment_on_comment)
+        rel_comment_on_comment_with_post = Relationship(comment, "COMMENTED", post)
+        graph.create(rel_comment_on_comment_with_post)
 
 def get_recent_posts():
     query = 'MATCH (u:User )-[:PUBLISHED]->(p:Post) RETURN u,p ORDER BY p.timestamp DESC LIMIT 25'
     return graph.cypher.execute(query)
-
 
 def timestamp():
     epoch = datetime.utcfromtimestamp(0)
