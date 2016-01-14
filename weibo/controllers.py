@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, session, redirect, url_for, render_template, flash
-from models import User, Post, get_recent_posts
+from models import User, Post, Comment, get_recent_posts
 
 import re
 
@@ -141,3 +141,28 @@ def show_user_profile(user_id):
     # Check login status
 
     return render_template('user_profile_page.html', user_id=user_id)
+
+@app.route('/comment/<post_id>', methods=['GET'])
+def comment_page(post_id):
+    user_id = session.get('user_id')
+    if user_id:
+        post = Post.find_by_id(post_id)
+        return render_template('comment_post.html', post = post,user_id=user_id)
+    else:
+        return redirect(url_for('index'))
+		
+
+@app.route('/add_comment', methods=['POST'])
+def add_comment():
+    user_id = session.get('user_id')
+    if user_id:
+        content = request.form['content']
+        post_id = request.form['post_id']
+        if not content or len(content) == 0:
+            flash('评论内容不能为空','danger')
+        else:
+            User.comment_on_post(user_id, post_id, content, 'tags')
+            flash('成功评论', 'success')
+            post = Post.find_by_id(post_id)
+            return render_template('post_page.html', post=post)
+    return redirect(url_for('index'))
