@@ -161,7 +161,7 @@ def add_comment():
         if not content or len(content) == 0:
             flash('评论内容不能为空','danger')
         else:
-            User.comment_on_post(user_id, post_id, content, 'tags')
+            User.add_comment_on_post(user_id, post_id, content, 'tags')
             flash('成功评论', 'success')
             post = Post.find_by_id(post_id)
             return render_template('post_page.html', post=post)
