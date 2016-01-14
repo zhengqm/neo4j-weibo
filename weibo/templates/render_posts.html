@@ -22,7 +22,8 @@
         <span class="post-small"> 
         <a href="/comment/{{post.p['id']}}">评论()</a> </span>
         
-        <span class="post-small"> 赞() </span>
+        <span class="post-small">
+		<a href="/like/{{post.p['id']}}">赞()</a> </span>
 
         <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 更多 </span></a>
 

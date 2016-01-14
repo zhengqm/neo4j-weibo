@@ -122,8 +122,8 @@ class User:
             date=date()
         )
         rel_publish = Relationship(user, "PUBLISHED", comment)
-        graph.create(rel)
-        Comment.comment_on_post(comment.id, target_id, tags)#what is the 1st argument when a class method is called?
+        graph.create(rel_publish)
+        Comment.comment_on_post(comment['id'], target_id, tags)#what is the 1st argument when a class method is called?
 
     @classmethod
     def add_comment_on_comment(cls, user_id, target_id, content, tags):
@@ -157,7 +157,11 @@ class Post:
         post = Post.find_by_id(post_id)
         rel_repost = Relationship(repost, "REPOSTED", post)
         graph.create(rel_repost)
-
+    @classmethod
+    def retrieve_comments(cls, post_id):
+        query = 'MATCH (u:User)-[:PUBLISHED]->(c:Comment)-[:COMMENTED]->(Post{id:{post_id}}) RETURN u,c ORDER BY c.timestamp DESC LIMIT 25'
+        return graph.cypher.execute(query, post_id=post_id)
+		
 class Comment:
     @classmethod
     def find_by_id(cls, comment_id):
@@ -168,7 +172,7 @@ class Comment:
     def comment_on_post(cls, comment_id, post_id, tags):
         comment = Comment.find_by_id(comment_id)
         post = Post.find_by_id(post_id)
-        rel_comment_on_post = Relationship(repost, "COMMENTED", post)
+        rel_comment_on_post = Relationship(comment, "COMMENTED", post)
         graph.create(rel_comment_on_post)
 
     @classmethod

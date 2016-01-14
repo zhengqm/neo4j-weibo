@@ -8,9 +8,25 @@
 
 <h3>Todo: </h3>
 
-<ul>
     <li>评论</li>
-    <li>点赞</li>
-</ul>
+	{% for comment in comments %}
 
+<div class="panel panel-default post">
+  <div class="panel-heading">
+    <span class="panel-title"><a href="{{url_for('show_user', user_id=comment.u['id'])}}">{{comment.u['nickname']}}</a> 说: </span>
+
+    <span class="pull-right post-small">{{comment.c['date']}}</span>
+
+  </div>
+  <div class="panel-body">
+    <p class="postbody">
+    {{comment.c['content']}}
+    </p>
+  </div>
+  <a href="/comment/"
+</div>
+
+
+{% endfor %}
+<li>点赞</li>
 <a href="{{url_for('index')}}">返回主页</a>

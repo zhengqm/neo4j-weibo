@@ -112,8 +112,10 @@ def add_post():
 def show_post(post_id):
     # Check login status
     post = Post.find_by_id(post_id)
+	# Search all the comments related.
+    comments = Post.retrieve_comments(post_id)
     if post:
-        return render_template('post_page.html', post=post)
+        return render_template('post_page.html', post=post, comments=comments)
     else:
         return redirect(url_for('index'))
 
@@ -163,6 +165,14 @@ def add_comment():
         else:
             User.add_comment_on_post(user_id, post_id, content, 'tags')
             flash('成功评论', 'success')
-            post = Post.find_by_id(post_id)
-            return render_template('post_page.html', post=post)
+            return redirect(url_for('show_post', post_id=post_id))
     return redirect(url_for('index'))
+
+
+@app.route('/like/<post_id>', methods=['GET'])
+def like_post(post_id):
+    user_id = session.get('user_id')
+    if user_id:
+        User.like_post(user_id, post_id)
+        return redirect(url_for('show_post', post_id=post_id))
+    return redirect(url_for('comment_page', post_id = post_id))
