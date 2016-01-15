@@ -5,6 +5,14 @@ from models import User, Post, Comment, get_recent_posts
 import re
 
 app = Flask(__name__)
+# From http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
+UPLOAD_FOLDER = 'static/Uploads'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
@@ -104,6 +112,21 @@ def add_post():
         else:
             content = transform_mention_text(content, user_id)
             User.add_post(user_id, content, [])
+            flash('成功发布', 'success')
+            return redirect(url_for('show_user', user_id=user_id))
+
+    return redirect(url_for('index'))
+
+@app.route('/add_image', methods=['POST'])
+def add_image():
+    user_id = session.get('user_id')
+    if user_id:
+        image = request.files['image']
+        if image and allowed_file(image.filename):
+            fname = secure_filename(image.filename) #获取一个安全的文件名，且仅仅支持ascii字符；
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], fname)) # From http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
+            User.add_image(user_id, fname, [])
+
             flash('成功发布', 'success')
             return redirect(url_for('show_user', user_id=user_id))
 

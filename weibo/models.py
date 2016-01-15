@@ -73,6 +73,19 @@ class User:
         graph.create(rel)
 
     @classmethod
+    def add_image(cls, user_id, fname, tags):
+        user = User.find_by_id(user_id)
+        u_file = Node(
+            "File",
+            id=str(uuid.uuid4()), 
+            fname=fname,
+            timestamp=timestamp(),
+            date=date()
+        )
+        rel = Relationship(user, "UPLOADED", u_file)
+        graph.create(rel)
+
+    @classmethod
     def like_post(cls, user_id, post_id):
         user = User.find_by_id(user_id)
         post = graph.find_one("Post", "id", post_id)
