@@ -20,7 +20,7 @@
     <span class="pull-right">
 
         <span class="post-small"> 
-        <a href="{{url_for('show_post', post_id=post.p['id'])}}">评论()</a> </span>
+        <a href="{{url_for('show_post', post_id=post.p['id'])}}">评论({% if post.c %}{{post.c}}{% else %}0{% endif %})</a> </span>
         
         <!--span class="post-small">
 		<a href="/like/{{post.p['id']}}">赞()</a> </span-->

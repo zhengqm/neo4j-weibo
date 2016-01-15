@@ -127,7 +127,6 @@ def show_user(user_id):
     self_id = session.get('user_id')
     user = User.find_by_id(user_id)
     posts = User.retrieve_posts(user_id)
-
     if user:
         if self_id and User.is_following(self_id, user_id):
             return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True)
@@ -172,7 +171,7 @@ def add_comment():
                     User.add_comment_on_comment(user_id, target_user_id, post_id, content, 'tags')
                     flash('成功评论', 'success')
                     return redirect(url_for('show_post', post_id=post_id))
-            #post_user_id = Post.find_poster(post_id)
+            post_user_id = Post.find_poster(post_id)
             User.add_comment_on_post(user_id, user_id, post_id, content, 'tags')
             flash('成功评论', 'success')
             return redirect(url_for('show_post', post_id=post_id))

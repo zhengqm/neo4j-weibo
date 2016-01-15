@@ -42,12 +42,11 @@ document.getElementById('target_user_id').value = target_user_id;
   </div>
   <div class="panel-body">
     <p class="postbody">
-	{{comment.c['content']}} 
-	<!--{%if comment.t %}
+	{%if comment.t == None %}
     {{comment.c['content']}} 
 	{% else %}
 	回复<a href="{{url_for('show_user', user_id=comment.t['id'])}}">{{comment.t['nickname']}}</a>:{{comment.c['content']}}
-	{% endif %}-->
+	{% endif %}
 	<span class="pull-right post-small"><input type="button" value="回复" onclick="replyTo('{{comment.u['nickname']}}', '{{comment.u['id']}}');" ></span>
   </div>
   <a href="/comment/"
