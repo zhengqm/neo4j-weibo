@@ -19,25 +19,80 @@
 
     <span class="pull-right">
 
-        <span class="post-small"> 
-        <a href="{{url_for('show_post', post_id=post.p['id'])}}">评论()</a> </span>
         
-        <!--span class="post-small">
-		<a href="/like/{{post.p['id']}}">赞()</a> </span-->
+        <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 评论()</span></a> 
+        
+        <span class="post-small" id="{{post.p['id']}}">
+
+        {% if session.user_id%}
+
+            {%if post.my_like > 0 %}
+
+            <a class="like" href="#" style="display:none"><span class="post-small">赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a>
+    		<a class="unlike" href="#"><span class="highlight">取消赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a> </span>
+
+            {% else %}
+
+            <a class="like" href="#"><span class="post-small">赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a>
+            <a class="unlike" href="#" style="display:none"><span class="highlight">取消赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a> </span>
+
+            {% endif %}
+        {% endif %}
+
+
 
         <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 更多 </span></a>
-
-
-
     </span>
-
-
-    
-
-
   </div>
 </div>
 
 
 {% endfor %}
 </div>
+<script type="text/javascript">
+
+
+$(".like").click(function () {
+    post_id = $(this).parent().attr('id')
+    url = "/like_post/" + post_id
+
+    $.post(url, function(data) {
+        if (data.result){
+            $(".count-" + post_id).text(data.count)
+            toggle(post_id)
+        }
+    })
+
+    return false
+})
+
+
+$(".unlike").click(function () {
+    post_id = $(this).parent().attr('id')
+    url = "/unlike_post/" + post_id
+
+    $.post(url, function(data) {
+        if (data.result){
+            $(".count-" + post_id).text(data.count)
+            toggle(post_id)
+        }
+    })
+
+    return false
+})
+
+
+function toggle(post_id) {
+    var children = $("#" + post_id).children()
+    var c0 = children[0]
+    var c1 = children[1]
+    if ($(c0).css("display") == "none"){
+        $(c0).css("display", "inline")
+        $(c1).css("display", "none")
+    } else {
+        $(c0).css("display", "none")
+        $(c1).css("display", "inline")
+    }
+}
+
+</script>

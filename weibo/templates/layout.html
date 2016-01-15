@@ -4,6 +4,11 @@
     {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='posts.css') }}">
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  
+    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+
+    
     <title>{% block title %}{% endblock %} - 微博</title>
     {% endblock %}
 
@@ -49,8 +54,6 @@
     <div id="content" >{% block content %}{% endblock %}</div>
     <div id="footer"></div>
 
-    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
   
     </div>
   </body>

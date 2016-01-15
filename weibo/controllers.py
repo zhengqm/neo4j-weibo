@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request, session, redirect, url_for, render_template, flash
+from flask import Flask, request, session, redirect, url_for, render_template, flash, jsonify
 from models import User, Post, Comment, get_recent_posts
 
 import re
@@ -21,7 +21,7 @@ def index():
 @app.route('/recent_posts')
 def recent_posts():
     if session.get('user_id'):
-        posts = get_recent_posts()
+        posts = get_recent_posts(session.get('user_id'))
         return render_template('recent_posts.html', posts = posts)
     else:
         return redirect(url_for('index'))
@@ -178,18 +178,20 @@ def add_comment():
             return redirect(url_for('show_post', post_id=post_id))
     return redirect(url_for('index'))
 
-@app.route('/like/<post_id>', methods=['POST'])
+@app.route('/like_post/<post_id>', methods=['POST'])
 def like_post(post_id):
     user_id = session.get('user_id')
     if user_id:
         User.like_post(user_id, post_id)
-        return True # Should be some json here?
-    return False 
+        count = Post.count_like(post_id)
+        return jsonify(result=True, count=count)
+    return jsonify(result=False) 
 
-@app.route('/unlike/<post_id>', methods=['POST'])
+@app.route('/unlike_post/<post_id>', methods=['POST'])
 def unlike_post(post_id):
     user_id = session.get('user_id')
     if user_id:
         if User.unlike_post(user_id, post_id):
-            return True # Should be some json here?
-    return False
+            count = Post.count_like(post_id)
+            return jsonify(result=True, count=count)
+    return jsonify(result=False, count=10)
