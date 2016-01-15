@@ -20,7 +20,7 @@
     <span class="pull-right">
 
         
-        <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 评论()</span></a> 
+        <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 评论({% if post.c %}{{post.c}}{% else %}0{% endif %})</span></a>
         
         <span class="post-small" id="{{post.p['id']}}">
 
