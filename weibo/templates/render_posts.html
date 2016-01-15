@@ -12,7 +12,9 @@
   </div>
   <div class="panel-body">
     <p class="postbody">
-    {{post.p['content']}}
+
+    {{ render_post_content(post.p['content']) | safe }}
+
     </p>
 
     
