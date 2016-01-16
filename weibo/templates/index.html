@@ -8,7 +8,7 @@
 
 {% block content %}
 {% if session.user_id %}
-    <h2>你好 {{ nickname }}! </h2>
+    <h2>你好 <img src="{{user_portrait_url}}" alt="求真像" height=50 width=50 />{{ nickname }}! </h2>
 
     
     <div class="row">

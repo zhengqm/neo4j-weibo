@@ -43,9 +43,9 @@ class User:
         return graph.cypher.execute(query, user_id=user_id, nickname=nickname).one
 
     @classmethod
-    def register(cls, email, password, nickname):
+    def register(cls, email, password, nickname, portrait):
         if not User.find_by_email(email):
-            user = Node("User", id=str(uuid.uuid4()), email=email, password=bcrypt.encrypt(password), nickname=nickname)
+            user = Node("User", id=str(uuid.uuid4()), email=email, password=bcrypt.encrypt(password), nickname=nickname, portrait = portrait)
             graph.create(user)
             return True
         else:
@@ -58,6 +58,16 @@ class User:
             return bcrypt.verify(password, user['password'])
         else:
             return False
+
+    @classmethod
+    def change_portrait(cls, user_id, fname):
+        user = User.find_by_id(user_id);
+        query = """
+        MATCH (u:User {id:{user_id}})
+        SET u.portrait = {fname}
+        """
+        print user_id, fname
+        graph.cypher.execute(query, user_id=user_id, fname=fname)
 
     @classmethod
     def add_post(cls, user_id, content, tags):

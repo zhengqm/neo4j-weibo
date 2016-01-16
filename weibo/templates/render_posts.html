@@ -5,7 +5,9 @@
 
 <div class="panel panel-default post">
   <div class="panel-heading">
-    <span class="panel-title"><a href="{{url_for('show_user', user_id=post.u['id'])}}">{{post.u['nickname']}}</a> 说: </span> 
+    <span class="panel-title">
+        <img src="{{post.u['portrait']}}" alt="求真像" height=50 width=50 />
+        <a href="{{url_for('show_user', user_id=post.u['id'])}}">{{post.u['nickname']}}</a> 说: </span> 
 
     <span class="pull-right post-small">{{post.p['date']}}</span>
 

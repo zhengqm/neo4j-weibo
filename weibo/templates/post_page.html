@@ -35,7 +35,10 @@ document.getElementById('target_user_id').value = target_user_id;
 
 <div class="panel panel-default post">
   <div class="panel-heading">
-    <span class="panel-title"><a href="{{url_for('show_user', user_id=comment.u['id'])}}">{{comment.u['nickname']}}</a> 说: </span>
+    <span class="panel-title">
+      <img src="{{comment.u['portrait']}}" alt="求真像" height=20 width=20 />
+      <a href="{{url_for('show_user', user_id=comment.u['id'])}}">{{comment.u['nickname']}}</a> 说: 
+    </span>
 
     <span class="pull-right post-small">{{comment.c['date']}}</span>
 
@@ -45,7 +48,7 @@ document.getElementById('target_user_id').value = target_user_id;
 	{%if comment.t == None %}
     {{comment.c['content']}} 
 	{% else %}
-	回复<a href="{{url_for('show_user', user_id=comment.t['id'])}}">{{comment.t['nickname']}}</a>:{{comment.c['content']}}
+	回复<img src="{{comment.t['portrait']}}" alt="求真像" height=20 width=20 /><a href="{{url_for('show_user', user_id=comment.t['id'])}}">{{comment.t['nickname']}}</a>:{{comment.c['content']}}
 	{% endif %}
 	<span class="pull-right post-small"><input type="button" value="回复" onclick="replyTo('{{comment.u['nickname']}}', '{{comment.u['id']}}');" ></span>
   </div>
