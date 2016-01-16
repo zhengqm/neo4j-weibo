@@ -28,14 +28,29 @@
     {% endif %}
 {% endif %}
 
-
 </h1>
-
     <div class="row">
         <div class="col-md-6">
-    	{% include "render_posts.html" %}
-    	</div>
- 	</div>
+		{% if friends_2_hop %}
+
+		<div class="panel panel-default post">
+			<div class="panel-heading">
+				<span class="panel-title">好友推荐</span></div> 
+				{% if session.user_id and session.user_id == user_id %}
+					{% for f in friends_2_hop %}
+						{%if f.r == None %}
+						<div class="panel-body">
+							<p class="postbody"><a href="{{url_for('show_user', user_id=f.f['id'])}}">{{f.f['nickname']}}</a></p>
+						<span class="pull-right"><a href="/follow/{{f.f['id']}}"><button type="button" class="btn btn-primary">关注</button></a></p>
+						</div>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+		</div>
+		{% endif %}
+    {% include "render_posts.html" %}
+    </div>
+ </div>
 
  {% endblock %}
 

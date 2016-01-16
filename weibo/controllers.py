@@ -193,18 +193,18 @@ def show_post(post_id):
 def show_user(user_id):
     self_id = session.get('user_id')
     user = User.find_by_id(user_id)
+    friends_2_hop = User.retrieve_2_hop_friends(user_id)
     if user:
         if self_id:
             posts = User.retrieve_posts(user_id, self_id)
-
+            liked_posts = User.retrieve_liked_posts(user_id, self_id)
             if User.is_following(self_id, user_id):
-                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True, user_portrait_url = user['portrait'])
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True, liked_posts=liked_posts, user_portrait_url = user['portrait'])
             else:
-                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False, user_portrait_url = user['portrait'])
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False, friends_2_hop=friends_2_hop, user_portrait_url = user['portrait'])
         else:
             posts = User.retrieve_posts(user_id)
             return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, user_portrait_url = user['portrait'])
-
     else:
         return redirect(url_for('index'))
 
