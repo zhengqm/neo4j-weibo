@@ -136,8 +136,16 @@ def show_post(post_id):
 	# Search all the comments related.
     comments = Post.retrieve_comments(post_id)
     likes = Post.retrieve_likes(post_id)
+
     if post:
-        return render_template('post_page.html', post=post, comments=comments, likes=likes)
+        self_id = session.get('user_id')
+        if self_id:
+            me_like = any(r.u['id'] == self_id for r in likes)
+        else:
+            me_like = False
+
+        poster = Post.find_poster(post_id)
+        return render_template('post_page.html', post=post, poster=poster.one, comments=comments, likes=likes, me_like=me_like)
     else:
         return redirect(url_for('index'))
 

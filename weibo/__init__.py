@@ -13,3 +13,4 @@ def render_post_content(content):
 
 
 app.jinja_env.globals.update(render_post_content=render_post_content)
+app.jinja_env.globals.update(len=len)
