@@ -7,8 +7,8 @@ import os
 import re
 
 app = Flask(__name__)
-# From http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
-UPLOAD_FOLDER = './weibo/static/portraits'
+
+UPLOAD_FOLDER = app.root_path + '/static/portraits'
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
