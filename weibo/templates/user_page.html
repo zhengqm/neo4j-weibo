@@ -4,7 +4,20 @@
 
 {% block content %}
 
-<h1>{{ nickname }} 的个人主页 
+<h1>
+	<img src="{{user_portrait_url}}" alt="求真像" height=50 width=50 />{{ nickname }}
+	</a>的个人主页 
+	{% if session.user_id and session.user_id == user_id%}
+		<form action="{{url_for('change_portrait')}}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+  			<div class="form-group">
+          		<div class="col-lg-4">
+  					修改头像:
+  					<input type="file" name="new_portrait" class="form-control" accept="file/gif, file/jpg" />
+  					<input type="submit" class="btn btn-default" value="上传" />
+				</div>
+			</div>
+		</form>
+	{% endif %}
 
 {% if session.user_id and session.user_id != user_id%}
     {% if is_following %}

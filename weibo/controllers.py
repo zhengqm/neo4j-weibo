@@ -1,10 +1,20 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, session, redirect, url_for, render_template, flash, jsonify
 from models import User, Post, Comment, get_recent_posts
+from werkzeug import secure_filename
 
+import os
 import re
 
 app = Flask(__name__)
+# From http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
+UPLOAD_FOLDER = '/Users/xiusichen/Documents/Course_Resources/MS_freshman_I/Massive_Graph_Data/final_proj/neo4j-weibo/weibo/static/portraits'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
@@ -12,7 +22,7 @@ def index():
     if user_id:
         user = User.find_by_id(user_id)
         posts = User.retrieve_feed(user_id)
-        return render_template('index.html',  posts = posts, nickname=user['nickname'])
+        return render_template('index.html',  posts = posts, nickname=user['nickname'], user_portrait_url = user['portrait'])
     else:
         posts = get_recent_posts()
         return render_template('index.html', posts = posts)
@@ -33,6 +43,7 @@ def register():
         nickname = request.form['nickname']
         email    = request.form['email']
         password = request.form['password']
+        portrait = '../static/portraits/default_portrait.jpg'
 
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             flash('电子邮件格式不正确','danger')
@@ -40,7 +51,7 @@ def register():
             flash('密码长度须大于等于6', 'danger')
         elif len(nickname) < 1:
             flash('昵称不能为空', 'danger')
-        elif not User.register(email, password, nickname):
+        elif not User.register(email, password, nickname, portrait):
             flash('该邮箱已被用于注册', 'danger')
         else:
             user = User.find_by_email(email)
@@ -93,18 +104,53 @@ def unfollow(target_id):
         return redirect(url_for('show_user', user_id=target_id))
     return redirect(url_for('index'))
 
+@app.route('/change_portrait/', methods=['POST'])
+def change_portrait():
+    user_id = session.get('user_id')
+    if user_id:
+        portrait = request.files['new_portrait']
+        if portrait and allowed_file(portrait.filename):
+            fname = secure_filename(portrait.filename) #获取一个安全的文件名，且仅仅支持ascii字符；
+            portrait.save(os.path.join(app.config['UPLOAD_FOLDER'], fname)) # From http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
+            User.change_portrait(user_id, '../static/portraits/' + fname)
+
+            flash('成功修改头像', 'success')
+            return redirect(url_for('show_user', user_id=user_id))
+
+    return redirect(url_for('index'))
+
+
+
 
 @app.route('/add_post', methods=['POST'])
 def add_post():
     user_id = session.get('user_id')
     if user_id:
         content = request.form['content']
+        image = request.files['image']
         if not content or len(content) == 0:
             flash('微博内容不能为空','danger')
         else:
             content = transform_mention_text(content, user_id)
             User.add_post(user_id, content, [])
+            
             flash('成功发布', 'success')
+            return redirect(url_for('show_user', user_id=user_id))
+
+    return redirect(url_for('index'))
+
+
+@app.route('/add_image', methods=['POST'])
+def add_image():
+    user_id = session.get('user_id')
+    if user_id:
+        image = request.files['image']
+        if image and allowed_file(image.filename):
+            fname = secure_filename(image.filename) #获取一个安全的文件名，且仅仅支持ascii字符；
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], fname)) # From http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
+            User.add_image(user_id, fname, [])
+
+            flash('成功发布图片', 'success')
             return redirect(url_for('show_user', user_id=user_id))
 
     return redirect(url_for('index'))
@@ -161,12 +207,12 @@ def show_user(user_id):
             posts = User.retrieve_posts(user_id, self_id)
             liked_posts = User.retrieve_liked_posts(user_id, self_id)
             if User.is_following(self_id, user_id):
-                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True, liked_posts=liked_posts)
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True, liked_posts=liked_posts, user_portrait_url = user['portrait'])
             else:
-                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False, friends_2_hop=friends_2_hop)
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False, friends_2_hop=friends_2_hop, user_portrait_url = user['portrait'])
         else:
             posts = User.retrieve_posts(user_id)
-            return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id)
+            return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, user_portrait_url = user['portrait'])
     else:
         return redirect(url_for('index'))
 
