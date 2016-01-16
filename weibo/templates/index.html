@@ -8,7 +8,7 @@
 
 {% block content %}
 {% if session.user_id %}
-    <h2>你好 <img src="{{user_portrait_url}}" alt="求真像" height=50 width=50 />{{ nickname }}! </h2>
+    <h2><img src="{{user_portrait_url}}" alt="求真像" height=40 width=40 />{{ nickname }}你好! </h2>
 
     
     <div class="row">
@@ -23,13 +23,13 @@
         </div>
     </form>
 
-    <form action="{{ url_for('add_image') }}" method="post" id = "file_form" class="form-horizontal" enctype="multipart/form-data">
+    <!--form action="{{ url_for('add_image') }}" method="post" id = "file_form" class="form-horizontal" enctype="multipart/form-data">
         <div class="form-group">
           <div class="col-lg-8">
             <input type = "file" name="file" value="chose pic" class="form-control" accept="file/gif, file/jpeg, file/jpg"></input>
           </div>
         </div>
-    </form>
+    </form-->
 
     <div class="form-group">
       <div class="">
