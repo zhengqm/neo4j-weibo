@@ -109,6 +109,13 @@ class User:
         return graph.cypher.execute(query, user_id=user_id)
 
     @classmethod
+    def retrieve_liked_posts(cls, user_id)
+        query = """
+        MATCH (:User {id:{user_id}})-[:LIKED]->(p:Post)
+        RETURN p ORDER BY p.timestamp DESC LIMIT 25"""
+        return graph.cypher.execute(query, user_id=user_id)
+
+    @classmethod
     def retrieve_feed(cls, user_id):
         query = """
         MATCH (:User {id:{user_id}})-[:FOLLOWED]->(u:User)-[:PUBLISHED]->(p:Post)
@@ -119,6 +126,13 @@ class User:
         ORDER BY p.timestamp DESC LIMIT 25"""
         return graph.cypher.execute(query, user_id=user_id)
 
+    @classmethod
+    def retrieve_2_hop_friends(cls, user_id):
+        query = """
+		MATCH (:User {id:{user_id}})-[:FOLLOWED]->()-[:FOLLOWED]->(f:User)
+		OPTIONAL MATCH (:User {id:{user_id}})-[r:FOLLOWED]->(f)
+        RETURN f,r ORDER BY f.nickname ASC LIMIT 25"""
+        return graph.cypher.execute(query, user_id=user_id)
     @classmethod
     def add_comment_on_post(cls, user_id, user_id_of_target, post_id, content, tags):
         user = User.find_by_id(user_id)
