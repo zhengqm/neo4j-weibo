@@ -8,8 +8,8 @@ import re
 
 app = Flask(__name__)
 # From http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
-UPLOAD_FOLDER = '/Users/xiusichen/Documents/Course_Resources/MS_freshman_I/Massive_Graph_Data/final_proj/neo4j-weibo/weibo/static/portraits'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+UPLOAD_FOLDER = './weibo/static/portraits'
+ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):

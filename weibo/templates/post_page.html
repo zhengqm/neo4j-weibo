@@ -121,7 +121,7 @@ function toggle(post_id) {
   <div class="panel-body">
 {% for like in likes %}
 
-    <a href="{{url_for('show_user', user_id=like.u['id'])}}">@{{like.u['nickname']}} </a>
+    <a href="{{url_for('show_user', user_id=like.u['id'])}}"><img src="{{like.u['portrait']}}" alt="" height=30 width=30 /></a>
  
 {% endfor %}
 </div>
