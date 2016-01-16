@@ -6,14 +6,18 @@ from datetime import datetime
 import os
 import uuid
 
+
 url = os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474')
-username = "neo4j"
-password = "weibo-project"
+username = os.environ.get('NEO4J_USERNAME')
+password = os.environ.get('NEO4J_PASSWORD')
+
 
 if username and password:
     authenticate(url.strip('http://'), username, password)
 
-graph = Graph(url + '/db/data/')
+#graph = Graph(url + '/db/data/')
+
+graph = ServiceRoot(url).graph
 
 
 class User:
