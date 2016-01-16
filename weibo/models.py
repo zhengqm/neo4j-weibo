@@ -140,7 +140,7 @@ class User:
 
 
     @classmethod
-    def retrieve_liked_posts(cls, user_id)
+    def retrieve_liked_posts(cls, user_id):
         query = """
         MATCH (:User {id:{user_id}})-[:LIKED]->(p:Post)
         RETURN p ORDER BY p.timestamp DESC LIMIT 25"""

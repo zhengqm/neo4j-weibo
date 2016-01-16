@@ -147,7 +147,7 @@ def show_post(post_id):
 def show_user(user_id):
     self_id = session.get('user_id')
     user = User.find_by_id(user_id)
-	liked_posts = User.retrieve_liked_posts(user_id)
+    liked_posts = User.retrieve_liked_posts(user_id)
     friends_2_hop = User.retrieve_2_hop_friends(user_id)
     if user:
         if self_id:
