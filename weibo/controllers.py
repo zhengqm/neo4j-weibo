@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, session, redirect, url_for, render_template, flash, jsonify
-from models import User, Post, Comment, get_recent_posts
+from models import User, Post, Comment, get_recent_posts, get_hot_posts
 from werkzeug import secure_filename
 
 import os
@@ -36,6 +36,13 @@ def recent_posts():
     else:
         return redirect(url_for('index'))
 
+@app.route('/hot_posts')
+def hot_posts():
+    if session.get('user_id'):
+        posts = get_hot_posts(session.get('user_id'))
+        return render_template('hot_posts.html', posts = posts)
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -103,6 +110,20 @@ def unfollow(target_id):
         User.unfollow_user(self_id, target_id)
         return redirect(url_for('show_user', user_id=target_id))
     return redirect(url_for('index'))
+
+@app.route('/followingList/<user_id>')
+def fetch_following(user_id):
+    self_id = session.get('user_id')
+    followings = User.find_following(user_id, self_id)
+    user = User.find_by_id(user_id)
+    return render_template('following.html', followings=followings, user=user)
+
+@app.route('/followerList/<user_id>')
+def fetch_follower(user_id):
+    self_id = session.get('user_id')
+    followers = User.find_follower(user_id, self_id)
+    user = User.find_by_id(user_id)
+    return render_template('follower.html', followers=followers, user=user)
 
 @app.route('/change_portrait/', methods=['POST'])
 def change_portrait():
@@ -205,10 +226,11 @@ def show_user(user_id):
         if self_id:
             posts = User.retrieve_posts(user_id, self_id)
             liked_posts = User.retrieve_liked_posts(user_id, self_id)
+            user_info = User.fetch_self_information(user_id).one
             if User.is_following(self_id, user_id):
-                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True, liked_posts=liked_posts, user_portrait_url = user['portrait'])
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True, liked_posts=liked_posts, user_portrait_url = user['portrait'], user_info=user_info)
             else:
-                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False, friends_2_hop=friends_2_hop, user_portrait_url = user['portrait'])
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False, friends_2_hop=friends_2_hop, user_portrait_url = user['portrait'], user_info=user_info)
         else:
             posts = User.retrieve_posts(user_id)
             return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, user_portrait_url = user['portrait'])
