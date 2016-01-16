@@ -127,7 +127,6 @@ def add_post():
     user_id = session.get('user_id')
     if user_id:
         content = request.form['content']
-        image = request.files['image']
         if not content or len(content) == 0:
             flash('微博内容不能为空','danger')
         else:
