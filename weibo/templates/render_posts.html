@@ -50,6 +50,55 @@
 
 
 {% endfor %}
+{% for post in liked_posts %}
+
+<div class="panel panel-default post">
+  <div class="panel-heading">
+    <span class="panel-title">他赞过的微博:<a href="{{url_for('show_user', user_id=post.u['id'])}}">{{post.u['nickname']}}</a> 说: </span> 
+
+    <span class="pull-right post-small">{{post.p['date']}}</span>
+
+  </div>
+  <div class="panel-body">
+    <p class="postbody">
+
+    {{ render_post_content(post.p['content']) | safe }}
+
+    </p>
+
+    
+
+    <span class="pull-right">
+
+        
+        <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 评论({% if post.c %}{{post.c}}{% else %}0{% endif %})</span></a>
+        
+        <span class="post-small" id="{{post.p['id']}}">
+
+        {% if session.user_id%}
+
+            {%if post.my_like > 0 %}
+
+            <a class="like" href="#" style="display:none"><span class="post-small">赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a>
+    		<a class="unlike" href="#"><span class="highlight">取消赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a> </span>
+
+            {% else %}
+
+            <a class="like" href="#"><span class="post-small">赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a>
+            <a class="unlike" href="#" style="display:none"><span class="highlight">取消赞(<span class="count-{{post.p['id']}}">{{post.total_like}}</span>)</span></a> </span>
+
+            {% endif %}
+        {% endif %}
+
+
+
+        <a href="{{url_for('show_post', post_id=post.p['id'])}}"><span class="post-small"> 更多 </span></a>
+    </span>
+  </div>
+</div>
+
+
+{% endfor %}
 </div>
 <script type="text/javascript">
 
