@@ -38,7 +38,7 @@ def register():
             flash('电子邮件格式不正确','danger')
         elif len(password) < 6:
             flash('密码长度须大于等于6', 'danger')
-        elif len(nickname) < 6:
+        elif len(nickname) < 1:
             flash('昵称不能为空', 'danger')
         elif not User.register(email, password, nickname):
             flash('该邮箱已被用于注册', 'danger')
@@ -102,11 +102,32 @@ def add_post():
         if not content or len(content) == 0:
             flash('微博内容不能为空','danger')
         else:
+            content = transform_mention_text(content, user_id)
             User.add_post(user_id, content, [])
             flash('成功发布', 'success')
             return redirect(url_for('show_user', user_id=user_id))
 
     return redirect(url_for('index'))
+
+
+def transform_mention_text(content, user_id):
+    """
+    Method for parsing and transforming post content related to mentioning
+    @someone  =>   @someone(someone's user ID)
+    """
+    pattern = re.compile("@[^ ~!#$%^&*?]+")
+    mentioned = set(pattern.findall(content))
+    mention_mapping = {}
+    for nickname in mentioned:
+        if "(" in nickname and ")" in nickname:
+            continue
+        mentioned_user = User.find_by_nickname(user_id, nickname[1:])
+        if mentioned_user:
+            mention_mapping[nickname] = mentioned_user.u['id']
+
+    for nickname, real_id in mention_mapping.items():
+        content = content.replace(nickname, nickname + "(" + real_id + ")")
+    return content
 
 @app.route('/post/<post_id>', methods=['GET'])
 def show_post(post_id):
@@ -126,6 +147,7 @@ def show_post(post_id):
 def show_user(user_id):
     self_id = session.get('user_id')
     user = User.find_by_id(user_id)
+<<<<<<< HEAD
     posts = User.retrieve_posts(user_id)
     liked_posts = User.retrieve_liked_posts(user_id)
     friends_2_hop = User.retrieve_2_hop_friends(user_id)
@@ -134,6 +156,19 @@ def show_user(user_id):
             return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True, friends_2_hop=friends_2_hop,liked_posts=liked_posts)
         else:
             return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, friends_2_hop=friends_2_hop,liked_posts=liked_posts)
+=======
+    if user:
+        if self_id:
+            posts = User.retrieve_posts(user_id, self_id)
+
+            if User.is_following(self_id, user_id):
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = True)
+            else:
+                return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False)
+        else:
+            posts = User.retrieve_posts(user_id)
+            return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id)
+>>>>>>> origin/master
 
     else:
         return redirect(url_for('index'))
@@ -192,7 +227,10 @@ def like_post(post_id):
 def unlike_post(post_id):
     user_id = session.get('user_id')
     if user_id:
+        app.logger.warning(Post.count_like(post_id))
         if User.unlike_post(user_id, post_id):
             count = Post.count_like(post_id)
+            app.logger.warning(count)
             return jsonify(result=True, count=count)
-    return jsonify(result=False, count=10)
+    return jsonify(result=False)
+
