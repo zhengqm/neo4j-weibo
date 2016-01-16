@@ -31,8 +31,8 @@
       <ul class="nav navbar-nav navbar-right">
       {% if session.user_id %}
         
-            <li><a href="{{url_for('recent_posts')}}">
-            最新微博</a></li>
+            <li><a href="{{url_for('recent_posts')}}">最新微博</a></li>
+			<li><a href="{{url_for('hot_posts')}}">热门微博</a></li>
             <li><!--img src="{{user_portrait_url}}.jpg" alt="求真像" height=10 width=10 /-->
                 <a href="{{url_for('show_user', user_id=session.user_id)}}">我的主页</a>
             </li>

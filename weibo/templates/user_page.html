@@ -5,40 +5,37 @@
 {% block content %}
 
     <div class="row">
+	{% if session.user_id and session.user_id != user_id%}
+	<div class="col-md-3"></div>
+	{%endif %}
         <div class="col-md-6">
 
 <h1>
 	<img src="{{user_portrait_url}}" alt="求真像" height=50 width=50 />{{ nickname }}的个人主页 
-
+	{% if session.user_id and session.user_id != user_id%}
+		{% if is_following %}
+		<a href="/unfollow/{{user_id}}"><button type="button" class="btn btn-warning">取消关注</button></a>
+		{% else %}
+		<a href="/follow/{{user_id}}"><button type="button" class="btn btn-primary">关注</button></a>
+		{% endif %}
+	{% endif %}
 </h1>
+微博{{user_info.pCnt}} 
+关注<a href="/followingList/{{user_id}}">{{user_info.followingCnt}}</a> 
+粉丝 <a href="/followerList/{{user_id}}">{{user_info.followingCnt}}</a>
 
-
-
-{% if session.user_id and session.user_id != user_id%}
-    {% if is_following %}
-    <a href="/unfollow/{{user_id}}"><button type="button" class="btn btn-warning">取消关注</button></a>
-    {% else %}
-    <a href="/follow/{{user_id}}"><button type="button" class="btn btn-primary">关注</button></a>
-
-    {% endif %}
-{% endif %}
-
-
-		{% if friends_2_hop %}
-
-		<div class="panel panel-default post">
-			<div class="panel-heading">
-				<span class="panel-title">好友推荐</span></div> 
-				{% if session.user_id and session.user_id == user_id %}
-					{% for f in friends_2_hop %}
-						{%if f.r == None %}
+{% if friends_2_hop and session.user_id and session.user_id == user_id and friends_2_hop.isExist != 0%}
+	<div class="panel panel-default post">
+		<div class="panel-heading">
+			<span class="panel-title">好友推荐</span></div> 
+				{% for f in friends_2_hop %}
+					{%if f.r == None and f.f['id'] != user_id %}
 						<div class="panel-body">
-							<p class="postbody"><img src="{{f.f['portrait']}}" alt="求真像" height=50 width=50><a href="{{url_for('show_user', user_id=f.f['id'])}}">{{f.f['nickname']}}</a></p>
+						<p class="postbody"><img src="{{f.f['portrait']}}" alt="求真像" height=50 width=50><a href="{{url_for('show_user', user_id=f.f['id'])}}">{{f.f['nickname']}}</a></p>
 						<span class="pull-right"><a href="/follow/{{f.f['id']}}"><button type="button" class="btn btn-primary">关注</button></a></p>
 						</div>
-						{% endif %}
-					{% endfor %}
-				{% endif %}
+					{% endif %}
+				{% endfor %}
 		</div>
 		{% endif %}
     {% include "render_posts.html" %}

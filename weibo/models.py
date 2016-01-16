@@ -128,7 +128,18 @@ class User:
         query = 'MATCH (:User {id:{fans_id}})-[r:FOLLOWED]->(:User {id:{target_id}}) RETURN r LIMIT 1'
         r = graph.cypher.execute(query, fans_id=fans_id, target_id=target_id)
         return r.one != None
-  
+    
+    @classmethod
+    def fetch_self_information(cls, user_id):
+        query = """
+		 MATCH (u:User {id:{user_id}})
+		 OPTIONAL MATCH (u)-[:PUBLISHED]->(p:Post)
+		 OPTIONAL MATCH (u)-[:FOLLOWED]->(following)
+		 OPTIONAL MATCH (u)<-[:FOLLOWED]-(follower)
+		 RETURN COUNT(DISTINCT p) AS pCnt, COUNT(DISTINCT following) AS followingCnt, 
+			COUNT(DISTINCT follower) AS followerCnt"""
+        return graph.cypher.execute(query, user_id=user_id)
+
     @classmethod
     def retrieve_liked_posts(cls, user_id, self_id = None):
         if self_id:
@@ -137,14 +148,14 @@ class User:
             OPTIONAL MATCH ()-[r:LIKED]->(p:Post)
             OPTIONAL MATCH (:User {id: {self_id}})-[me:LIKED]->(p:Post)
             RETURN u,p,COUNT(r) AS total_like, COUNT(me) AS my_like
-            ORDER BY p.timestamp DESC LIMIT 25
+            ORDER BY p.timestamp DESC LIMIT 3
             """
 
             q2 = """
             MATCH (:User {id: {user_id}})-[:LIKED]->(p:Post)<-[:PUBLISHED]-(u:User)
             OPTIONAL MATCH  (u:User {id:{user_id}})-[:LIKED]->(p:Post)<-[:COMMENTED]-(c:Comment)
             RETURN u,p, COUNT(c) AS c
-            ORDER BY p.timestamp DESC LIMIT 25
+            ORDER BY p.timestamp DESC LIMIT 3
             """
 
             r1 = graph.cypher.execute(q1, user_id=user_id, self_id=self_id)
@@ -157,7 +168,7 @@ class User:
             MATCH (:User {id: {user_id}})-[:LIKED]->(p:Post)<-[:PUBLISHED]-(u:User)
             OPTIONAL MATCH  (u:User {id:{user_id}})-[:LIKED]->(p:Post)<-[:COMMENTED]-(c:Comment)
             RETURN u,p, COUNT(c) AS c
-            ORDER BY p.timestamp DESC LIMIT 25
+            ORDER BY p.timestamp DESC LIMIT 3
             """
             return graph.cypher.execute(query, user_id=user_id)
 			
@@ -214,13 +225,29 @@ class User:
         combine(r1, r2, 'c')
 
         return r1
+		
+    @classmethod
+    def find_following(cls, user_id, self_id):
+        query = """
+		MATCH (:User {id:{user_id}})-[:FOLLOWED]->(f)
+		OPTIONAL MATCH (:User {id:{self_id}})-[flw:FOLLOWED]->(f)
+        RETURN f,COUNT(flw) AS following ORDER BY f.nickname ASC LIMIT 25"""
+        return graph.cypher.execute(query, user_id=user_id, self_id=self_id)
+
+    @classmethod
+    def find_follower(cls, user_id, self_id):
+        query = """
+		MATCH (:User {id:{user_id}})<-[:FOLLOWED]-(f)
+		OPTIONAL MATCH (:User {id:{self_id}})-[flw:FOLLOWED]->(f)
+        RETURN f,COUNT(flw) AS following ORDER BY f.nickname ASC LIMIT 25"""
+        return graph.cypher.execute(query, user_id=user_id, self_id=self_id)
 
     @classmethod
     def retrieve_2_hop_friends(cls, user_id):
         query = """
 		MATCH (:User {id:{user_id}})-[:FOLLOWED]->()-[:FOLLOWED]->(f:User)
 		OPTIONAL MATCH (:User {id:{user_id}})-[r:FOLLOWED]->(f)
-        RETURN f,r ORDER BY f.nickname ASC LIMIT 25"""
+        RETURN f,r, COUNT(f) - COUNT(r) AS isExist ORDER BY f.nickname ASC LIMIT 25"""
         return graph.cypher.execute(query, user_id=user_id)
     @classmethod
     def add_comment_on_post(cls, user_id, user_id_of_target, post_id, content, tags):
@@ -351,6 +378,26 @@ def get_recent_posts(user_id = None):
     
     combine(r1, r2, 'c')
     return r1
+
+def get_hot_posts(user_id = None):
+    if user_id:
+        query = """
+        MATCH (u:User)-[:PUBLISHED]->(p:Post)
+        OPTIONAL MATCH (l:User)-[:LIKED]->(p:Post)
+        OPTIONAL MATCH (:User {id: {user_id}})-[me:LIKED]->(p:Post)
+		OPTIONAL MATCH (p:Post)<-[:COMMENTED]-(c:Comment)
+        RETURN u,p,COUNT(DISTINCT l) AS total_like, COUNT(me) AS my_like, COUNT(DISTINCT c) AS c
+        ORDER BY total_like + c DESC LIMIT 25
+        """
+    else:
+        query = """
+        MATCH (u:User)-[:PUBLISHED]->(p:Post)
+        OPTIONAL MATCH (l:User)-[:LIKED]->(p:Post)
+		OPTIONAL MATCH (p:Post)<-[:COMMENTED]-(c:Comment)
+        RETURN u,p,COUNT(DISTINCT l) AS total_like, 0 AS my_like, COUNT(DISTINCT c) AS c
+        ORDER BY total_like + c DESC LIMIT 25
+        """
+    return graph.cypher.execute(query, user_id=user_id)
 
 def timestamp():
     epoch = datetime.utcfromtimestamp(0)
