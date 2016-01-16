@@ -15,9 +15,9 @@ password = os.environ.get('NEO4J_PASSWORD')
 if username and password:
     authenticate(url.strip('http://'), username, password)
 
-#graph = Graph(url + '/db/data/')
+graph = Graph(url + '/db/data/')
 
-graph = ServiceRoot(url).graph
+#graph = ServiceRoot(url).graph
 
 
 class User:
