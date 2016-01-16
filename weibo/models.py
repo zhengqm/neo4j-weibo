@@ -336,7 +336,7 @@ def timestamp():
     return delta.total_seconds()
 
 def date():
-    return datetime.now().strftime('%Y-%m-%d')
+    return datetime.now().strftime('%Y-%m-%d %H:%M')
 
 
 def combine(left, right, attrname):
