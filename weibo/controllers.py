@@ -216,7 +216,7 @@ def show_post(post_id):
         return redirect(url_for('index'))
 
 @app.route('/users/', methods=['GET'])
-def all_users(user_id):
+def all_users():
     all_users = User.find_all_users()
     return render_template('all_users.html', all_users=all_users)
 
