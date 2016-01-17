@@ -53,7 +53,7 @@ class User:
         RETURN u as r 
         ORDER BY u.nickname ASC LIMIT 25
         """
-        return graph.cypher.execute(query, user_id=user_id, nickname=nickname).one
+        return graph.cypher.execute(query)
 
     @classmethod
     def register(cls, email, password, nickname, portrait):
