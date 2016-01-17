@@ -22,7 +22,7 @@
 </h1>
 微博{{user_info.pCnt}} 
 关注<a href="/followingList/{{user_id}}">{{user_info.followingCnt}}</a> 
-粉丝 <a href="/followerList/{{user_id}}">{{user_info.followingCnt}}</a>
+粉丝 <a href="/followerList/{{user_id}}">{{user_info.followerCnt}}</a>
 
 {% if friends_2_hop and session.user_id and session.user_id == user_id and friends_2_hop.isExist != 0%}
 	<div class="panel panel-default post">

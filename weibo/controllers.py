@@ -233,7 +233,7 @@ def show_user(user_id):
                 return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, is_following = False, friends_2_hop=friends_2_hop, user_portrait_url = user['portrait'], user_info=user_info)
         else:
             posts = User.retrieve_posts(user_id)
-            return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, user_portrait_url = user['portrait'])
+            return render_template('user_page.html', nickname=user['nickname'], posts=posts, user_id=user_id, user_portrait_url = user['portrait'], user_info=user_info)
     else:
         return redirect(url_for('index'))
 
