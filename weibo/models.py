@@ -50,7 +50,7 @@ class User:
     def find_all_users(cls, user_id):
         query = """
         MATCH (u:User)
-	OPTIONAL MATCH (:User{id:user_id})-[flw:FOLLOWED]->(u)
+	OPTIONAL MATCH (:User{id:{user_id}})-[flw:FOLLOWED]->(u)
         RETURN u,COUNT(flw) AS following
         ORDER BY u.nickname ASC LIMIT 25
         """
