@@ -47,6 +47,15 @@ class User:
         return graph.cypher.execute(query, user_id=user_id, nickname=nickname).one
 
     @classmethod
+    def find_all_users(cls):
+        query = """
+        MATCH (u:User)
+        RETURN u as r 
+        ORDER BY u.nickname ASC LIMIT 25
+        """
+        return graph.cypher.execute(query, user_id=user_id, nickname=nickname).one
+
+    @classmethod
     def register(cls, email, password, nickname, portrait):
         if not User.find_by_email(email):
             user = Node("User", id=str(uuid.uuid4()), email=email, password=bcrypt.encrypt(password), nickname=nickname, portrait = portrait)
