@@ -15,12 +15,14 @@
 							<a href="{{url_for('show_user', user_id=f.u['id'])}}">
 							<img src="{{f.u['portrait']}}" alt="求真像" height=30 width=30 />{{f.u['nickname']}}</a> 
 							{%if session.user_id and f.u['id'] != session.user_id%}
+							<span class="pull-right">
 								{% if f.following == 1%}
 									<a href="/unfollow/{{f.u['id']}}"><button type="button" class="btn btn-warning">取消关注</button></a>
 									{% else %}
 									<a href="/follow/{{f.u['id']}}"><button type="button" class="btn btn-primary">关注</button></a>
 
 								{% endif %}
+							</span>
 							{% endif %}
 						</span>
 					</div>
