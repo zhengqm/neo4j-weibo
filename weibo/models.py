@@ -47,10 +47,11 @@ class User:
         return graph.cypher.execute(query, user_id=user_id, nickname=nickname).one
 
     @classmethod
-    def find_all_users(cls):
+    def find_all_users(cls, user_id):
         query = """
         MATCH (u:User)
-        RETURN u as r 
+	OPTIONAL MATCH (:User{id:user_id})-[flw:FOLLOWED]->(u)
+        RETURN u,COUNT(flw) AS following
         ORDER BY u.nickname ASC LIMIT 25
         """
         return graph.cypher.execute(query)

@@ -36,7 +36,7 @@
             <li><!--img src="{{user_portrait_url}}.jpg" alt="求真像" height=10 width=10 /-->
                 <a href="{{url_for('show_user', user_id=session.user_id)}}">我的主页</a>
             </li>
-	    <li><a href="{{url_for('all_users')}}">所有用户</a></li>
+	    <li><a href="{{url_for('all_users', user_id=session.user_id)}}">所有用户</a></li>
 
             <li><a href="{{url_for('logout')}}"> 退出登录</a></li>
       {% else %}

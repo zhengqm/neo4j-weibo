@@ -12,13 +12,13 @@
 				<div class="panel panel-default post">
 					<div class="panel-heading">
 						<span class="panel-body">
-							<a href="{{url_for('show_user', user_id=f.f['id'])}}">
-							<img src="{{f.f['portrait']}}" alt="求真像" height=30 width=30 />{{f.f['nickname']}}</a> 
-							{%if session.user_id and f.f['id'] != session.user_id%}
+							<a href="{{url_for('show_user', user_id=f.u['id'])}}">
+							<img src="{{f.u['portrait']}}" alt="求真像" height=30 width=30 />{{f.u['nickname']}}</a> 
+							{%if session.user_id and f.u['id'] != session.user_id%}
 								{% if f.following == 1%}
-									<a href="/unfollow/{{f.f['id']}}"><button type="button" class="btn btn-warning">取消关注</button></a>
+									<a href="/unfollow/{{f.u['id']}}"><button type="button" class="btn btn-warning">取消关注</button></a>
 									{% else %}
-									<a href="/follow/{{f.f['id']}}"><button type="button" class="btn btn-primary">关注</button></a>
+									<a href="/follow/{{f.u['id']}}"><button type="button" class="btn btn-primary">关注</button></a>
 
 								{% endif %}
 							{% endif %}
